@@ -21,11 +21,14 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
+        'cython>=0.13',
         'nltk',
         'opster',
+        'pandas',
         'python-dateutil',
         'scikit-learn',
         'setuptools',
+        'tables',
     ],
     entry_points={
         'console_scripts': [
