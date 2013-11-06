@@ -14,7 +14,6 @@ class Dispatcher(opster.Dispatcher):
                 ('v', 'verbose', False, 'Be verbose.'),
                 ('l', 'limit', 0, 'Limit the number of utterances by this value.'),
                 ('p', 'path', './swda', 'The path to the swda dir.'),
-
             )
         )
 
@@ -37,7 +36,8 @@ def _middleware(func):
 
         corpus = CorpusReader(path)
         utterances = corpus.iter_utterances(display_progress=False)
-        utterances = islice(utterances, limit)
+        if limit:
+            utterances = islice(utterances, limit)
 
         if 'utterances' in f_args:
             kwargs['utterances'] = utterances

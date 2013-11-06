@@ -1,7 +1,6 @@
 from collections import Counter, deque
 from functools import wraps
 
-from .swda import CorpusReader
 from .io import write_cooccurrence_matrix
 
 
@@ -38,15 +37,11 @@ def writer(command, extra_options=tuple()):
         @command(options=options)
         @wraps(f)
         def wrapped(
-            path,
+            utterances,
             output='out.h5',
             **context
         ):
-            corpus = CorpusReader(path)
-            utterances = corpus.iter_utterances(display_progress=False)
-
             counter = Counter(f(utterances, **context))
-
             return write_cooccurrence_matrix(counter, output)
 
         return wrapped
