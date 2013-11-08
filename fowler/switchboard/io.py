@@ -1,15 +1,15 @@
 import pandas as pd
 
 
-def write_cooccurrence_matrix(counter, output):
+def write_cooccurrence_matrix(counter, output, utterances):
     if output == '-':
         for (row, column), count in counter.items():
             print(row, column, count)
     else:
-        write_cooccurrence_matrix_hd5(counter, output)
+        write_cooccurrence_matrix_hd5(counter, output, utterances)
 
 
-def write_cooccurrence_matrix_hd5(counter, output):
+def write_cooccurrence_matrix_hd5(counter, output, utterances):
     rows_set = set(row for row, _ in counter.keys())
     cols_set = set(col for _, col in counter.keys())
 
@@ -21,6 +21,9 @@ def write_cooccurrence_matrix_hd5(counter, output):
     row_labels = []
     col_labels = []
     data = []
+
+    labels = [u.damsl_act_tag() for u in utterances]
+
     for (row, col), count in counter.items():
         row_labels.append(row)
         col_labels.append(col)
@@ -37,4 +40,4 @@ def write_cooccurrence_matrix_hd5(counter, output):
         store['row_ids'] = pd.Series(row_ids)
         store['col_ids'] = pd.Series(col_ids)
         store['data'] = pd.Series(data)
-
+        store['labels'] = pd.Series(labels)

@@ -17,7 +17,7 @@ dispatch = dispatcher.dispatch
 @command()
 def transcripts(
     utterances,
-    format=('f', '{u.caller} {u.act_tag}: {u.text}', 'Format.'),
+    format=('f', '{u.caller} {damsl_act_tag}: {u.text}', 'Format.'),
 ):
     """Print all the transcripts in a human readable way."""
     caller = None
@@ -27,13 +27,22 @@ def transcripts(
                 print()
             caller = utterance.caller
 
-        print(format.format(u=utterance))
+        print(format.format(
+            u=utterance,
+            damsl_act_tag=utterance.damsl_act_tag(),
+        ))
 
 
 @command()
-def tags(utterances):
+def tags(
+    utterances,
+    damsl=('d', False, 'Use the DAMSL tags.')
+):
     """Count tag frequencies in the corpora."""
-    counter = Counter(u.act_tag for u in utterances)
+    if not damsl:
+        counter = Counter(u.act_tag for u in utterances)
+    else:
+        counter = Counter(u.damsl_act_tag() for u in utterances)
 
     for tag, freq in counter.most_common():
         print(freq, tag)

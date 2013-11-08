@@ -28,21 +28,26 @@ def WordUtterance(utterances, ngram_len):
             yield word, document_id
 
 
-def writer(command, extra_options=tuple()):
+def writer(
+    command,
+    extra_options=tuple(),
+):
     def wrapper(f):
         options = extra_options + (
             ('n', 'ngram_len', 1, 'Length of the tokens (bigrams, ngrams).'),
+            ('o', 'output', 'out.h5', 'The output file.'),
         )
 
         @command(options=options)
         @wraps(f)
         def wrapped(
-            utterances,
-            output='out.h5',
+            utterances_iter,
+            output,
+            corpus,
             **context
         ):
-            counter = Counter(f(utterances, **context))
-            return write_cooccurrence_matrix(counter, output)
+            counter = Counter(f(utterances_iter(), **context))
+            return write_cooccurrence_matrix(counter, output, utterances_iter())
 
         return wrapped
 

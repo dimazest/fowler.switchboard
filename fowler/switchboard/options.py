@@ -11,7 +11,6 @@ class Dispatcher(opster.Dispatcher):
         globaloptions = (
             tuple(globaloptions) +
             (
-                ('v', 'verbose', False, 'Be verbose.'),
                 ('l', 'limit', 0, 'Limit the number of utterances by this value.'),
                 ('p', 'path', './swda', 'The path to the swda dir.'),
             )
@@ -30,17 +29,27 @@ def _middleware(func):
 
         f_args = inspect.getargspec(func)[0]
 
-        verbose = kwargs.pop('verbose')
         limit = kwargs.pop('limit')
         path = kwargs.pop('path')
 
         corpus = CorpusReader(path)
-        utterances = corpus.iter_utterances(display_progress=False)
-        if limit:
-            utterances = islice(utterances, limit)
+
+        def utterances_iter():
+            utterances = corpus.iter_utterances(display_progress=False)
+            if limit:
+                utterances = islice(utterances, limit)
+
+            for u in utterances:
+                yield u
 
         if 'utterances' in f_args:
-            kwargs['utterances'] = utterances
+            kwargs['utterances'] = utterances_iter()
+
+        if 'utterances_iter' in f_args:
+            kwargs['utterances_iter'] = utterances_iter
+
+        if 'corpus' in f_args:
+            kwargs['corpus'] = corpus
 
         return func(*args, **kwargs)
 
