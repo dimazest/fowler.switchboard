@@ -22,8 +22,25 @@ def counter():
     ))
 
 
-def test_write_cooccurrence_matrix_hd5(counter, output):
-    io.write_cooccurrence_matrix_hd5(counter, output)
+@pytest.fixture
+def utterances():
+
+    class Utterance(object):
+        @staticmethod
+        def damsl_act_tag():
+            return 'Q'
+
+    return [
+        Utterance,
+        Utterance,
+        Utterance,
+        Utterance,
+        Utterance,
+    ]
+
+
+def test_write_cooccurrence_matrix_hd5(counter, output, utterances):
+    io.write_cooccurrence_matrix_hd5(counter, output, utterances)
 
     with pd.get_store(output) as store:
 
