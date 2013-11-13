@@ -24,7 +24,12 @@ def ContextBefore(utterances, context_len=3, ngram_len=1):
 
 def WordUtterance(utterances, ngram_len):
     for document_id, utterance in enumerate(utterances):
-        for word, _ in utterance.pos_lemmas():
+        words = utterance.pos_words()
+        # TODO: it would be nice to treat utterances that don't
+        # contain any word differently.
+        if not words:
+            yield '<NON_VERBAL>', document_id
+        for word in words:
             yield word, document_id
 
 
