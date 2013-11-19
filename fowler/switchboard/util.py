@@ -1,36 +1,42 @@
+import sys
+from itertools import chain
 from collections import Counter, deque
 from functools import wraps
 
 from .io import write_cooccurrence_matrix
 
 
-def tokens(utterances, n=1):
-    for utterance in utterances:
-        ngram = deque([], n)
-        for w, _ in utterance.pos_lemmas():
-            ngram.append(w)
-            yield utterance.act_tag, '_'.join(ngram)
+def utterance_ngrams(utterance, ngram_len=1):
+    ngram = deque(['<BEGIN>'], ngram_len)
+
+    words = chain(utterance.pos_words(), ['<END>'])
+
+    for w in words:
+        ngram.append(w)
+
+        yield '_'.join(ngram)
 
 
-def ContextBefore(utterances, context_len=3, ngram_len=1):
-    context = deque([], context_len)
-
-    for utterance in utterances:
-        context.append(utterance)
-
-        for token in tokens(context, ngram_len):
-            yield token
-
-
-def WordUtterance(utterances, ngram_len):
+def WordUtterance(utterances, ngram_len, verbose=False):
     for document_id, utterance in enumerate(utterances):
-        words = utterance.pos_words()
+        ngrams = utterance_ngrams(utterance, ngram_len=ngram_len)
+
+        if verbose:
+            sys.stderr.write(
+                'Document id: {document_id}\n'
+                'Words: {ngrams}\n'
+                '\n'.format(
+                    document_id=document_id,
+                    ngrams=' '.join(ngrams),
+                )
+            )
+
         # TODO: it would be nice to treat utterances that don't
         # contain any word differently.
-        if not words:
+        if not ngrams:
             yield '<NON_VERBAL>', document_id
-        for word in words:
-            yield word, document_id
+        for ngram in ngrams:
+            yield ngram, document_id
 
 
 def writer(
@@ -40,7 +46,8 @@ def writer(
     def wrapper(f):
         options = extra_options + (
             ('n', 'ngram_len', 1, 'Length of the tokens (bigrams, ngrams).'),
-            ('o', 'output', 'out.h5', 'The output file.'),
+            ('o', 'output', 'swda-{limit}items-{ngram_len}gram.h5', 'The output file.'),
+            ('v', 'verbose', False, 'Be verbose.'),
         )
 
         @command(options=options)
@@ -49,9 +56,16 @@ def writer(
             utterances_iter,
             output,
             corpus,
+            limit,
             **context
         ):
             counter = Counter(f(utterances_iter(), **context))
+
+            output = output.format(
+                limit=limit,
+                ngram_len=context['ngram_len'],
+            )
+
             return write_cooccurrence_matrix(counter, output, utterances_iter())
 
         return wrapped

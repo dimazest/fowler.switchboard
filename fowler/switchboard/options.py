@@ -51,6 +51,9 @@ def _middleware(func):
         if 'corpus' in f_args:
             kwargs['corpus'] = corpus
 
+        if 'limit' in f_args:
+            kwargs['limit'] = limit
+
         return func(*args, **kwargs)
 
     return wrapper

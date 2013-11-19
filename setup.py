@@ -43,6 +43,7 @@ setup(
         'pandas',
         'python-dateutil',
         'scikit-learn',
+        'scipy',
         'setuptools',
         'tables',
     ],

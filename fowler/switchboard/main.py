@@ -1,11 +1,6 @@
 from collections import Counter
 
-from .util import (
-    tokens,
-    ContextBefore,
-    WordUtterance,
-    writer,
-)
+from .util import WordUtterance, writer
 from .options import Dispatcher
 
 
@@ -49,23 +44,6 @@ def tags(
 
 
 @writer(command)
-def word_document(utterances, ngram_len):
+def word_document(utterances, ngram_len, verbose):
     """Word document."""
-    return WordUtterance(utterances, ngram_len=ngram_len)
-
-
-@writer(command)
-def inner(utterances, ngram_len):
-    return tokens(utterances, n=ngram_len)
-
-
-@writer(
-    command,
-    extra_options=(
-        ('c', 'context-len', 3, 'Length of the context in "before mode.'),
-    )
-)
-def before(utterances, ngram_len, context_len):
-    return ContextBefore(utterances, context_len, ngram_len=ngram_len)
-
-
+    return WordUtterance(utterances, ngram_len=ngram_len, verbose=verbose)
