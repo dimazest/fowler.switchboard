@@ -39,8 +39,16 @@ def utterances():
     ]
 
 
-def test_write_cooccurrence_matrix_hd5(counter, output, utterances):
-    io.write_cooccurrence_matrix_hd5(counter, output, utterances)
+@pytest.fixture
+def metadata():
+    return {
+        'key': 'value',
+        'other key': 'other value',
+    }
+
+
+def test_write_cooccurrence_matrix_hd5(counter, output, utterances, metadata):
+    io.write_cooccurrence_matrix_hd5(counter, output, utterances, metadata)
 
     with pd.get_store(output) as store:
 
@@ -60,3 +68,5 @@ def test_write_cooccurrence_matrix_hd5(counter, output, utterances):
         assert tuple(store['col_ids']) == tuple(col2id[c] for c in store['col_labels'])
 
         assert tuple(store['data'].values) == (3, 4, 2, 1)
+
+        assert store.get_storer('data').attrs.metadata == metadata
