@@ -66,7 +66,11 @@ def writer(
                 ngram_len=context['ngram_len'],
             )
 
-            return write_cooccurrence_matrix(counter, output, utterances_iter())
+            metadata = {
+                'ngram length': context['ngram_len'],
+            }
+
+            return write_cooccurrence_matrix(counter, output, utterances_iter(), metadata)
 
         return wrapped
 
