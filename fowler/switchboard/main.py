@@ -47,3 +47,15 @@ def tags(
 def word_document(utterances, ngram_len, verbose):
     """Word document."""
     return WordUtterance(utterances, ngram_len=ngram_len, verbose=verbose)
+
+
+@command()
+def trees(utterances):
+
+    for utterance in utterances:
+        trees = list(utterance.trees)
+        t = trees[0]
+        t.draw()
+        # import pdb; pdb.set_trace()
+        print(utterance)
+        print(t)
