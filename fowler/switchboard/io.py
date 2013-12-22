@@ -31,7 +31,7 @@ def write_cooccurrence_matrix_hd5(counter, output, utterances, metadata):
         col_ids.append(col2id[col])
         data.append(count)
 
-    with pd.get_store(output, mode='w') as store:
+    with pd.get_store(output, mode='w', complib='zlib', complevel=9) as store:
         store['row2id'] = row2id
         store['col2id'] = col2id
 
