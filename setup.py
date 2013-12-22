@@ -42,6 +42,7 @@ setup(
         'opster',
         'pandas',
         'python-dateutil',
+        'pyyaml',
         'scikit-learn',
         'scipy',
         'setuptools',
