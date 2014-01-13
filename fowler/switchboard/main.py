@@ -1,4 +1,5 @@
 from collections import Counter
+from itertools import chain
 
 from .util import WordUtterance, writer
 from .options import Dispatcher
@@ -51,11 +52,17 @@ def word_document(utterances, ngram_len, verbose):
 
 @command()
 def trees(utterances):
-
     for utterance in utterances:
         trees = list(utterance.trees)
         t = trees[0]
         t.draw()
-        # import pdb; pdb.set_trace()
-        print(utterance)
-        print(t)
+
+
+@command()
+def tokens(utterances):
+    words = chain.from_iterable(u.pos_words() for u in utterances)
+
+    freq = Counter(words)
+
+    for w, f in freq.most_common():
+        print(w, '\t', f)
