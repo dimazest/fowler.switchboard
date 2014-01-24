@@ -1,7 +1,7 @@
 from collections import Counter
 from itertools import chain
 
-from .util import WordUtterance, writer
+from .util import WordUtterance, writer, get_conversation_ids
 from .options import Dispatcher
 
 
@@ -44,10 +44,33 @@ def tags(
         print(freq, tag)
 
 
-@writer(command)
-def word_document(utterances, ngram_len, verbose):
+@writer(
+    command,
+    extra_options=(
+        ('', 'train_split', 'downloads/switchboard/ws97-train-convs.list.txt', 'The training splits'),
+        ('', 'test_split', 'downloads/switchboard/ws97-test-convs.list.txt', 'The testing splits'),
+    ),
+)
+def word_document(
+    utterances,
+    ngram_len,
+    verbose,
+    train_split,
+    test_split,
+):
     """Word document."""
-    return WordUtterance(utterances, ngram_len=ngram_len, verbose=verbose)
+    utterances = list(utterances)
+
+    train_split = get_conversation_ids(train_split)
+    test_split = get_conversation_ids(test_split)
+
+    train_utterances = [u for u in utterances if u.conversation_no in train_split]
+    test_utterances = [u for u in utterances if u.conversation_no in test_split]
+
+    assert len(train_utterances) == 213543
+    assert len(test_utterances) == 4514
+
+    return WordUtterance(train_utterances + test_utterances, ngram_len=ngram_len, verbose=verbose)
 
 
 @command()

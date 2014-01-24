@@ -6,17 +6,6 @@ from functools import wraps
 from .io import write_cooccurrence_matrix
 
 
-def utterance_ngrams(utterance, ngram_len=1):
-    ngram = deque(['<BEGIN>'], ngram_len)
-
-    words = chain(utterance.pos_words(), ['<END>'])
-
-    for w in words:
-        ngram.append(w)
-
-        yield '_'.join(ngram)
-
-
 def WordUtterance(utterances, ngram_len, verbose=False):
     for document_id, utterance in enumerate(utterances):
         ngrams = utterance_ngrams(utterance, ngram_len=ngram_len)
@@ -75,3 +64,17 @@ def writer(
         return wrapped
 
     return wrapper
+
+
+def get_conversation_ids(f_name):
+    """Read the conversation ids from test/train split.
+
+    The splits are:
+
+     * http://www.stanford.edu/~jurafsky/ws97/ws97-train-convs.list
+     * http://www.stanford.edu/~jurafsky/ws97/ws97-test-convs.list
+
+    """
+    with open(f_name) as f:
+        return set(int(l.strip()[2:]) for l in f)
+
